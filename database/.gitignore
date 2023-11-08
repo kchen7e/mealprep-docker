@@ -1,2 +1,3 @@
+# ignore everything in current folder but not the folder itself due to side effect of .gitignore itself
 *
 !.gitignore
