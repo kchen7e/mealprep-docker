@@ -1,0 +1,61 @@
+version: "3.8"
+
+networks:
+    mealprep:
+        driver: bridge
+        name: mealprep
+
+services:
+    mealprep-frontend:
+        build:
+            context: .
+            dockerfile: mealprep-frontend.Dockerfile
+        image: "mealprep-frontend:0.2"
+        container_name: "mealprep-frontend"
+        environment:
+            - REACT_APP_MEALPREP_BACKEND_HOSTNAME=$(REACT_APP_MEALPREP_BACKEND_HOSTNAME)
+            - REACT_APP_MEALPREP_BACKEND_PORT=$(REACT_APP_MEALPREP_BACKEND_PORT)
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mealprep-backend
+        networks:
+            - mealprep
+
+    mealprep-backend:
+        build:
+            context: .
+            dockerfile: mealprep-backend.Dockerfile
+        image: "mealprep-backend:0.4"
+        container_name: "mealprep-backend"
+        environment:
+            - DB_HOSTNAME=$(DB_HOSTNAME)
+            - DB_PORT=$(DB_PORT)
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mealprep-db
+        networks:
+            - mealprep
+
+    mealprep-db:
+        build:
+            context: .
+            dockerfile: mealprep-db.Dockerfile
+        image: "postgres:mealprep"
+        container_name: "mealprep-db"
+        environment:
+            - POSTGRES_USER=$(POSTGRES_USER)
+            - POSTGRES_PASSWORD=$(POSTGRES_PASSWORD)
+            - POSTGRES_DB=$(POSTGRES_DB)
+            # - PGUSER=app
+            # - PGPASSWORD=app
+            - LC_ALL=en_GB.UTF-8
+            - LC_CTYPE=en_GB.UTF-8
+        volumes:
+            - "./database:/var/lib/postgresql/data"
+        ports:
+            - "55000:5432"
+        networks:
+            - mealprep
+        restart: always
