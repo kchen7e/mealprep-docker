@@ -1,0 +1,82 @@
+networks:
+    mealprep:
+        driver: bridge
+        name: mealprep
+
+services:
+    mealprep-frontend:
+        build:
+            context: .
+            dockerfile: mealprep-frontend.Dockerfile
+        image: "mealprep-frontend:0.4.0"
+        container_name: "mealprep-frontend"
+        ports:
+            - "3000:80"
+        depends_on:
+            - mealprep-backend
+        networks:
+            - mealprep
+        restart: unless-stopped
+
+    mealprep-backend:
+        build:
+            context: .
+            dockerfile: mealprep-backend.Dockerfile
+        image: "mealprep-backend:0.8.0"
+        container_name: "mealprep-backend"
+        environment:
+            - DB_HOSTNAME=mealprep-db
+            - DB_PORT=5432
+            - DB_NAME=mealprep
+            - DB_USER=app
+            - DB_PASSWORD=app
+            - MINIO_ENDPOINT=http://mealprep-minio:9000
+            - MINIO_ACCESS_KEY=minioadmin
+            - MINIO_SECRET_KEY=minioadmin
+            - MINIO_PUBLIC_URL=https://cdn.mealprep.storm7e.de
+            - JWT_SECRET=mealprep-prod-secret-key-32chars!
+            - JWT_EXPIRY_MS=86400000
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mealprep-db
+            - mealprep-minio
+        networks:
+            - mealprep
+        restart: unless-stopped
+
+    mealprep-db:
+        build:
+            context: .
+            dockerfile: mealprep-db.Dockerfile
+        image: "postgres:mealprep"
+        container_name: "mealprep-db"
+        environment:
+            - POSTGRES_USER=app
+            - POSTGRES_PASSWORD=app
+            - POSTGRES_DB=mealprep
+            - LC_ALL=en_GB.UTF-8
+            - LC_CTYPE=en_GB.UTF-8
+        volumes:
+            - "./database:/var/lib/postgresql/data"
+        ports:
+            - "55000:5432"
+        networks:
+            - mealprep
+        restart: unless-stopped
+
+    mealprep-minio:
+        image: "minio/minio:latest"
+        container_name: "mealprep-minio"
+        environment:
+            - MINIO_ROOT_USER=minioadmin
+            - MINIO_ROOT_PASSWORD=minioadmin
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        volumes:
+            - "./minio_data:/data"
+        command: minio server /data --console-address ":9001"
+        networks:
+            - mealprep
+        restart: unless-stopped
