@@ -19,6 +19,7 @@ services:
             - mealprep-backend
         networks:
             - mealprep
+        restart: no
 
     mealprep-backend:
         build:
@@ -38,6 +39,7 @@ services:
             - mealprep-db
         networks:
             - mealprep
+        restart: no
 
     mealprep-db:
         build:
@@ -59,6 +61,22 @@ services:
             - 5432
         ports:
             - "5432:5432"
+        networks:
+            - mealprep
+        restart: always
+
+    mealprep-minio:
+        image: "minio/minio:latest"
+        container_name: "mealprep-minio"
+        environment:
+            - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+            - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        volumes:
+            - "./minio_data:/data"
+        command: minio server /data --console-address ":9001"
         networks:
             - mealprep
         restart: always
