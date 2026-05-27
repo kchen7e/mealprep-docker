@@ -2,7 +2,7 @@
 
 Docker Compose orchestration for the full MealPrep stack — frontend, backend, database, and MinIO object storage.
 
-**Backend version:** 0.8.0 | **Frontend version:** 0.2 | **Database:** PostgreSQL 15 | **Storage:** MinIO
+**Backend version:** 0.8.0 | **Frontend version:** 0.4.0 | **Database:** PostgreSQL 15 | **Storage:** MinIO
 
 ## Services
 
@@ -50,7 +50,7 @@ cp .env.example .env   # if you create one, or edit .env directly
 
 | Variable | Default | Description |
 |---|---|---|
-| `BACKEND_VERSION` | `0.7.1` | JAR version tag |
+| `BACKEND_VERSION` | `0.8.0` | JAR version tag |
 | `DB_USER` | `app` | DB user for backend |
 | `DB_PASSWORD` | `app` | DB password for backend |
 | `DB_HOSTNAME` | `mealprep-db` | DB host (container name) |
@@ -60,7 +60,7 @@ cp .env.example .env   # if you create one, or edit .env directly
 
 | Variable | Default | Description |
 |---|---|---|
-| `FRONTEND_VERSION` | `0.2` | Frontend image tag |
+| `FRONTEND_VERSION` | `0.4.0` | Frontend image tag |
 | `REACT_APP_MEALPREP_BACKEND_HOSTNAME` | `mealprep.storm7e.de` | Backend host (from browser) |
 | `REACT_APP_MEALPREP_BACKEND_PORT` | `8081` | Backend port (from browser) |
 
